@@ -50,6 +50,10 @@ setTick(async () => {
         }
 
         if(!CheckPedWeapon()){
+            if(IsPedArmed(Ped, 4)){
+                return IsHolstered = true;
+            }
+
             if(!IsHolstered){
                 console.log('Pull In Weapon');
                 TaskPlayAnim(Ped, 'reaction@intimidation@1h', 'outro', 8, 8, -1, 48, 0, false, false, false);
