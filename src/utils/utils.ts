@@ -24,3 +24,11 @@ export function GetPlayerVector(): VectorInterface{
         z: playerCoords[2]
     }
 }
+
+export const LoadAnimationDictionary = async (dictionary: string) => {
+    while(!HasAnimDictLoaded(dictionary)){
+        RequestAnimDict(dictionary);
+        await Delay(50);
+    }
+
+}
