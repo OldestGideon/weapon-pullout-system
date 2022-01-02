@@ -12,11 +12,30 @@ const CheckPedWeapon = (): boolean => {
 
     WeaponList.forEach(weapon => {
         if(GetHashKey(weapon) === PedWeapon){
-            console.log('CheckPedWeapon: ', true);
             result = true;
         }
     });
     return result;
+}
+const PullOutWeapon = async (Ped: number) => {
+    TaskPlayAnim(Ped, 'reaction@intimidation@1h', 'intro', 8, 8, -1, 48, 0, false, false, false);
+    DisablePlayerFiring(Ped, true);
+
+    await Delay(2500);
+
+    DisablePlayerFiring(Ped, false);
+    ClearPedTasks(Ped);
+    IsHolstered = false;
+}
+const PullInWeapon = async (Ped: number) => {
+    TaskPlayAnim(Ped, 'reaction@intimidation@1h', 'outro', 8, 8, -1, 48, 0, false, false, false);
+    DisablePlayerFiring(Ped, true);
+
+    await Delay(1500);
+
+    DisablePlayerFiring(Ped, false);
+    ClearPedTasks(Ped);
+    IsHolstered = true;
 }
 
 setTick(async () => {
@@ -28,42 +47,27 @@ setTick(async () => {
         await LoadAnimationDictionary('reaction@intimidation@1h');
         await LoadAnimationDictionary('weapons@pistol_1h@gang');
 
-        let PedHasNormalWeapon = CheckPedWeapon();
 
-        if(PedHasNormalWeapon){
 
-            console.log('Ped has Weapon');
+        /* If player doesn't have weapon already, and pulls out animated weapon */
 
+        if(CheckPedWeapon()){
             if(IsHolstered){
-                console.log('Pull Out Weapon');
-                TaskPlayAnim(Ped, 'reaction@intimidation@1h', 'intro', 8, 8, -1, 48, 0, false, false, false);
-                DisablePlayerFiring(Ped, true);
-
-                await Delay(2500);
-
-                DisablePlayerFiring(Ped, false);
-                ClearPedTasks(Ped);
-                IsHolstered = false;
+                PullOutWeapon(Ped);
             }
-        } else {
-            console.log('PedHasNormalWeapon: ', PedHasNormalWeapon);
         }
 
         if(!CheckPedWeapon()){
+
+            /* If player switch weapon from "correct" to "incorrect" just mark as holstered */
             if(IsPedArmed(Ped, 4)){
                 return IsHolstered = true;
             }
 
+
+            /* If player just pull in weapon, and don't keeps any weapon anymore  */
             if(!IsHolstered){
-                console.log('Pull In Weapon');
-                TaskPlayAnim(Ped, 'reaction@intimidation@1h', 'outro', 8, 8, -1, 48, 0, false, false, false);
-                DisablePlayerFiring(Ped, true);
-
-                await Delay(1500);
-
-                DisablePlayerFiring(Ped, false);
-                ClearPedTasks(Ped);
-                IsHolstered = true;
+                PullInWeapon(Ped);
             }
         }
     }
